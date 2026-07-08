@@ -195,19 +195,39 @@ export default function CheckoutPage() {
     }
   }
 
+  const STEPS = ['Bag', 'Delivery', 'Payment', 'Done']
+  const StepBar = ({ current }) => (
+    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '14px 24px', gap: 0, borderTop: '1px solid #e0dbd2' }}>
+      {STEPS.map((step, i) => (
+        <div key={step} style={{ display: 'flex', alignItems: 'center' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 5 }}>
+            <div style={{ width: 26, height: 26, borderRadius: '50%', background: i <= current ? '#111' : 'transparent', border: `1.5px solid ${i <= current ? '#111' : '#ccc'}`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 11, fontWeight: 700, color: i <= current ? 'white' : '#bbb' }}>
+              {i < current ? <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M2 5.5L4 7.5L8 3" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg> : i + 1}
+            </div>
+            <span style={{ fontSize: 9, color: i === current ? '#111' : '#bbb', fontWeight: i === current ? 700 : 400, letterSpacing: '0.06em', textTransform: 'uppercase', whiteSpace: 'nowrap' }}>{step}</span>
+          </div>
+          {i < STEPS.length - 1 && <div style={{ width: 32, height: 1, background: i < current ? '#111' : '#ddd', margin: '0 4px', marginBottom: 16, flexShrink: 0 }} />}
+        </div>
+      ))}
+    </div>
+  )
+
   return (
-    <div className="min-h-screen pb-44" style={{ background: '#f5f5f5' }}>
-      <header className="sticky top-0 z-10 flex items-center gap-3 px-4 py-4" style={{ background: 'white', borderBottom: '1px solid #eee' }}>
-        <button onClick={() => router.back()} className="w-9 h-9 rounded-full flex items-center justify-center" style={{ background: '#f0f0f0' }}>
-          <ArrowLeft size={18} color="#333" />
-        </button>
-        <p style={{ ...ZE, fontWeight: 700, fontSize: 16, color: '#111' }}>Checkout</p>
+    <div className="min-h-screen pb-44" style={{ background: '#f5f2ee' }}>
+      <header className="sticky top-0 z-10" style={{ background: '#faf9f7', borderBottom: '1px solid #e0dbd2' }}>
+        <div className="flex items-center gap-3 px-4 py-4" style={{ maxWidth: 640, margin: '0 auto' }}>
+          <button onClick={() => router.back()} className="w-9 h-9 rounded-full flex items-center justify-center" style={{ background: '#ece8e2' }}>
+            <ArrowLeft size={18} color="#333" />
+          </button>
+          <p style={{ fontWeight: 700, fontSize: 13, color: '#111', letterSpacing: '0.1em', textTransform: 'uppercase' }}>Checkout</p>
+        </div>
+        <StepBar current={1} />
       </header>
 
-      <div className="max-w-2xl mx-auto flex flex-col gap-4 px-4 pt-4">
+      <div className="max-w-2xl mx-auto flex flex-col gap-4 px-4 pt-4" style={{ maxWidth: 640 }}>
         {/* Contact */}
-        <div className="p-4 rounded-2xl flex flex-col gap-4" style={{ background: 'white' }}>
-          <p style={{ ...ZE, fontSize: 11, fontWeight: 700, color: '#111', letterSpacing: '0.06em' }}>CONTACT</p>
+        <div className="p-4 rounded-2xl flex flex-col gap-4" style={{ background: 'white', border: '1px solid #e0dbd2' }}>
+          <p style={{ ...ZE, fontSize: 11, fontWeight: 700, color: '#8a7f72', letterSpacing: '0.08em' }}>CONTACT</p>
           <input style={inputStyle} placeholder="Your name" value={form.name} onChange={e => set('name', e.target.value)} />
           <div className="flex items-center rounded-xl overflow-hidden" style={{ background: '#f0f0f0' }}>
             <span className="px-4 py-[14px] flex-shrink-0" style={{ ...ZN, fontSize: 15, color: '#555', borderRight: '1px solid #ddd' }}>+234</span>
@@ -221,13 +241,13 @@ export default function CheckoutPage() {
         </div>
 
         {/* Delivery */}
-        <div className="p-4 rounded-2xl flex flex-col gap-3" style={{ background: 'white' }}>
-          <p style={{ ...ZE, fontSize: 11, fontWeight: 700, color: '#111', letterSpacing: '0.06em' }}>DELIVERY</p>
+        <div className="p-4 rounded-2xl flex flex-col gap-3" style={{ background: 'white', border: '1px solid #e0dbd2' }}>
+          <p style={{ ...ZE, fontSize: 11, fontWeight: 700, color: '#8a7f72', letterSpacing: '0.08em' }}>DELIVERY</p>
           {DELIVERY_OPTIONS.map(opt => (
             <button key={opt.id} onClick={() => set('delivery', opt.id)}
-              className="flex items-center gap-3 p-3 rounded-2xl text-left w-full"
-              style={{ background: form.delivery === opt.id ? 'rgba(230,253,83,0.08)' : '#f7f7f7', border: `2px solid ${form.delivery === opt.id ? '#e6fd53' : 'transparent'}` }}>
-              <div style={{ width: 18, height: 18, borderRadius: 99, flexShrink: 0, border: form.delivery === opt.id ? '5px solid #111' : '2px solid #ccc' }} />
+              className="flex items-center gap-3 p-3 rounded-xl text-left w-full"
+              style={{ background: form.delivery === opt.id ? '#faf9f7' : '#f7f7f7', border: `1.5px solid ${form.delivery === opt.id ? '#111' : '#e0dbd2'}` }}>
+              <div style={{ width: 16, height: 16, borderRadius: 99, flexShrink: 0, border: form.delivery === opt.id ? '4px solid #111' : '1.5px solid #ccc' }} />
               <div className="flex-1">
                 <p style={{ ...ZN, fontSize: 14, fontWeight: 600, color: '#111' }}>{opt.label}</p>
                 <p style={{ ...ZN, fontSize: 12, color: '#999' }}>{opt.sub}</p>
@@ -243,8 +263,8 @@ export default function CheckoutPage() {
         </div>
 
         {/* Promo */}
-        <div className="p-4 rounded-2xl" style={{ background: 'white' }}>
-          <p style={{ ...ZE, fontSize: 11, fontWeight: 700, color: '#111', letterSpacing: '0.06em', marginBottom: 12 }}>PROMO</p>
+        <div className="p-4 rounded-2xl" style={{ background: 'white', border: '1px solid #e0dbd2' }}>
+          <p style={{ ...ZE, fontSize: 11, fontWeight: 700, color: '#8a7f72', letterSpacing: '0.08em', marginBottom: 12 }}>PROMO CODE</p>
           {appliedDeal ? (
             <div className="flex items-center justify-between px-3 py-3 rounded-xl" style={{ background: 'rgba(230,253,83,0.1)', border: '1.5px solid rgba(230,253,83,0.4)' }}>
               <div className="flex items-center gap-2">
@@ -274,16 +294,16 @@ export default function CheckoutPage() {
         </div>
 
         {/* Payment */}
-        <div className="p-4 rounded-2xl flex flex-col gap-3" style={{ background: 'white' }}>
-          <p style={{ ...ZE, fontSize: 11, fontWeight: 700, color: '#111', letterSpacing: '0.06em' }}>PAYMENT</p>
+        <div className="p-4 rounded-2xl flex flex-col gap-3" style={{ background: 'white', border: '1px solid #e0dbd2' }}>
+          <p style={{ ...ZE, fontSize: 11, fontWeight: 700, color: '#8a7f72', letterSpacing: '0.08em' }}>PAYMENT</p>
           {[
             { id: 'delivery', icon: <Package size={18} weight="fill" />, label: 'Pay on Delivery', sub: 'Cash or transfer when you receive', disabled: false },
             { id: 'card', icon: <CreditCard size={18} weight="fill" />, label: 'Pay with Card / Transfer', sub: hasPaystackKey ? 'Secure online payment via Paystack' : 'Not available for this store yet', disabled: !hasPaystackKey },
           ].map(opt => (
             <button key={opt.id} onClick={() => !opt.disabled && setPaymentMethod(opt.id)}
-              className="flex items-center gap-3 p-3 rounded-2xl text-left w-full"
-              style={{ background: paymentMethod === opt.id ? 'rgba(230,253,83,0.08)' : '#f7f7f7', border: `2px solid ${paymentMethod === opt.id ? '#e6fd53' : 'transparent'}`, opacity: opt.disabled ? 0.45 : 1 }}>
-              <div style={{ width: 18, height: 18, borderRadius: 99, flexShrink: 0, border: paymentMethod === opt.id ? '5px solid #111' : '2px solid #ccc' }} />
+              className="flex items-center gap-3 p-3 rounded-xl text-left w-full"
+              style={{ background: paymentMethod === opt.id ? '#faf9f7' : '#f7f7f7', border: `1.5px solid ${paymentMethod === opt.id ? '#111' : '#e0dbd2'}`, opacity: opt.disabled ? 0.45 : 1 }}>
+              <div style={{ width: 16, height: 16, borderRadius: 99, flexShrink: 0, border: paymentMethod === opt.id ? '4px solid #111' : '1.5px solid #ccc' }} />
               <span style={{ color: paymentMethod === opt.id ? '#111' : '#bbb' }}>{opt.icon}</span>
               <div className="flex-1">
                 <p style={{ ...ZN, fontSize: 14, fontWeight: 600, color: '#111' }}>{opt.label}</p>
@@ -297,16 +317,16 @@ export default function CheckoutPage() {
         </div>
 
         {/* Note */}
-        <div className="p-4 rounded-2xl" style={{ background: 'white' }}>
-          <p style={{ ...ZE, fontSize: 11, fontWeight: 700, color: '#111', letterSpacing: '0.06em', marginBottom: 12 }}>NOTE</p>
+        <div className="p-4 rounded-2xl" style={{ background: 'white', border: '1px solid #e0dbd2' }}>
+          <p style={{ ...ZE, fontSize: 11, fontWeight: 700, color: '#8a7f72', letterSpacing: '0.08em', marginBottom: 12 }}>NOTE TO SELLER</p>
           <textarea rows={3} style={{ ...inputStyle, resize: 'vertical' }} placeholder="Note to seller (optional)"
             value={form.note} onChange={e => set('note', e.target.value)} />
         </div>
       </div>
 
       {/* Fixed bottom */}
-      <div className="fixed bottom-0 left-0 right-0 px-4 pb-8" style={{ background: 'white', borderTop: '1px solid #eee', paddingTop: 12 }}>
-        <div className="max-w-2xl mx-auto">
+      <div className="fixed bottom-0 left-0 right-0 px-4 pb-8" style={{ background: '#faf9f7', borderTop: '1px solid #e0dbd2', paddingTop: 12 }}>
+        <div style={{ maxWidth: 640, margin: '0 auto' }}>
           <button onClick={() => setSummaryOpen(o => !o)}
             className="w-full flex items-center justify-between px-3 py-3 rounded-xl mb-3" style={{ background: '#f7f7f7' }}>
             <span style={{ ...ZN, fontSize: 13, color: '#555' }}>
@@ -333,10 +353,10 @@ export default function CheckoutPage() {
           </p>
           {submitError && <p style={{ ...ZN, fontSize: 13, color: '#ef4444', textAlign: 'center', marginBottom: 8 }}>{submitError}</p>}
           <button onClick={handleSubmit} disabled={!canSubmit}
-            className="w-full py-4 rounded-full flex items-center justify-center gap-2"
-            style={{ background: canSubmit ? '#e6fd53' : 'rgba(230,253,83,0.3)', ...ZE, fontWeight: 700, fontSize: 16, color: '#060806', cursor: canSubmit ? 'pointer' : 'not-allowed' }}>
-            {submitting && <div className="w-4 h-4 rounded-full border-2 animate-spin" style={{ borderColor: '#060806', borderTopColor: 'transparent' }} />}
-            {submitting ? 'Processing…' : paymentMethod === 'card' ? 'Continue to Payment →' : 'Place Order'}
+            className="w-full py-4 rounded flex items-center justify-center gap-2"
+            style={{ background: canSubmit ? '#111' : '#ccc', fontWeight: 700, fontSize: 13, letterSpacing: '0.08em', color: 'white', cursor: canSubmit ? 'pointer' : 'not-allowed', border: 'none', borderRadius: 6 }}>
+            {submitting && <div className="w-4 h-4 rounded-full border-2 animate-spin" style={{ borderColor: 'rgba(255,255,255,0.4)', borderTopColor: 'white' }} />}
+            {submitting ? 'Processing…' : paymentMethod === 'card' ? 'CONTINUE TO PAYMENT' : 'PLACE ORDER'}
           </button>
         </div>
       </div>

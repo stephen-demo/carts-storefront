@@ -192,7 +192,7 @@ export default function ProductDetailPage() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-screen" style={{ background: '#f5f5f5' }}>
+      <div className="flex items-center justify-center min-h-screen" style={{ background: '#f5f2ee' }}>
         <div className="w-8 h-8 rounded-full border-2 animate-spin" style={{ borderColor: '#111', borderTopColor: 'transparent' }} />
       </div>
     )
@@ -200,7 +200,7 @@ export default function ProductDetailPage() {
 
   if (!product) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-screen gap-4 px-6" style={{ background: '#f5f5f5' }}>
+      <div className="flex flex-col items-center justify-center min-h-screen gap-4 px-6" style={{ background: '#f5f2ee' }}>
         <MagnifyingGlass size={48} weight="duotone" color="#bbb" />
         <p style={{ ...ZE, fontWeight: 700, fontSize: 18, color: '#111', textAlign: 'center' }}>Product not found</p>
         <button onClick={() => router.push(`/${handle}`)} className="px-6 py-3 rounded-full"
@@ -216,22 +216,22 @@ export default function ProductDetailPage() {
   const maxQty = product.stock > 0 ? product.stock : 0
 
   return (
-    <div className="min-h-screen" style={{ background: '#f5f5f5' }}>
+    <div className="min-h-screen" style={{ background: '#f5f2ee' }}>
       {/* Top nav bar */}
       <div className="sticky top-0 z-20 flex items-center justify-between px-4 py-3"
-        style={{ background: 'white', borderBottom: '1px solid #eee' }}>
+        style={{ background: '#faf9f7', borderBottom: '1px solid #e0dbd2' }}>
         <button onClick={() => router.push(`/${handle}`)}
           className="flex items-center gap-1.5 px-3 py-2 rounded-full"
-          style={{ background: '#f0f0f0' }}>
-          <Storefront size={14} weight="fill" color="#111" />
-          <span style={{ ...ZN, fontWeight: 600, fontSize: 12, color: '#111' }}>
+          style={{ background: '#ece8e2' }}>
+          <Storefront size={14} weight="fill" color="#555" />
+          <span style={{ ...ZN, fontWeight: 600, fontSize: 12, color: '#555' }}>
             {storeName || handle}
           </span>
         </button>
         <div className="flex items-center gap-2">
           <button onClick={toggleSave} className="w-9 h-9 rounded-full flex items-center justify-center"
-            style={{ background: '#f0f0f0' }}>
-            <Heart size={16} weight={saved ? 'fill' : 'regular'} color={saved ? '#ef4444' : '#111'} />
+            style={{ background: '#ece8e2' }}>
+            <Heart size={16} weight={saved ? 'fill' : 'regular'} color={saved ? '#ef4444' : '#555'} />
           </button>
         </div>
       </div>
@@ -243,8 +243,8 @@ export default function ProductDetailPage() {
           {/* LEFT: image gallery */}
           <div>
             {/* Main image */}
-            <div className="relative overflow-hidden md:rounded-3xl"
-              style={{ aspectRatio: '3/4', background: recolourCss ?? '#e5e7eb' }}>
+            <div className="relative overflow-hidden md:rounded-sm"
+              style={{ aspectRatio: '3/4', background: recolourCss ?? '#ece8e2' }}>
               {images[imgIndex]
                 ? <img src={images[imgIndex]} alt={product.name} className="w-full h-full object-cover"
                     style={{ mixBlendMode: recolourCss ? 'multiply' : 'normal' }} />
@@ -263,8 +263,8 @@ export default function ProductDetailPage() {
             {images.length > 1 && (
               <div className="flex gap-2 mt-3 px-4 md:px-0">
                 {images.map((im, i) => (
-                  <button key={i} onClick={() => setImgIndex(i)} className="rounded-xl overflow-hidden flex-shrink-0"
-                    style={{ width: 56, height: 56, background: '#e0e0e0', border: i === imgIndex ? '2px solid #111' : '2px solid transparent' }}>
+                  <button key={i} onClick={() => setImgIndex(i)} className="overflow-hidden flex-shrink-0"
+                    style={{ width: 64, height: 64, background: '#ece8e2', borderRadius: 4, border: i === imgIndex ? '2px solid #111' : '2px solid transparent' }}>
                     {im && <img src={im} alt="" className="w-full h-full object-cover" />}
                   </button>
                 ))}
@@ -286,11 +286,13 @@ export default function ProductDetailPage() {
               )}
             </div>
 
-            <h1 style={{ ...ZE, fontWeight: 700, fontSize: 22, color: '#111', lineHeight: 1.3 }}>{product.name}</h1>
-            {product.brand && <p style={{ ...ZN, fontSize: 13, color: '#999', marginTop: 2 }}>{product.brand}</p>}
+            <p style={{ ...ZN, fontSize: 10, color: '#8a7f72', letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: 6 }}>
+              {product.brand || storeName}
+            </p>
+            <h1 style={{ fontFamily: 'Georgia, serif', fontWeight: 700, fontSize: 24, color: '#111', lineHeight: 1.3 }}>{product.name}</h1>
 
             <div className="flex items-baseline gap-3 mt-3">
-              <p style={{ ...ZSC, fontWeight: 800, fontSize: 26, color: '#111' }}>{formatPrice(product.price)}</p>
+              <p style={{ fontFamily: 'Georgia, serif', fontWeight: 700, fontSize: 24, color: '#111' }}>{formatPrice(product.price)}</p>
             </div>
 
             <p className="mt-1" style={{ ...ZN, fontSize: 12, fontWeight: 600,
@@ -387,22 +389,22 @@ export default function ProductDetailPage() {
 
             {/* Description */}
             {product.description && (
-              <div className="mt-6 rounded-3xl bg-white overflow-hidden">
-                <button onClick={() => setShowDesc(d => !d)} className="flex items-center w-full px-5 py-4">
-                  <p style={{ ...ZN, fontWeight: 700, fontSize: 13, color: '#111', flex: 1 }}>Description</p>
-                  <CaretDown size={14} weight="bold" color="#666" style={{ transform: showDesc ? 'rotate(180deg)' : 'none', transition: 'transform 0.2s' }} />
+              <div className="mt-6 overflow-hidden" style={{ borderTop: '1px solid #e0dbd2' }}>
+                <button onClick={() => setShowDesc(d => !d)} className="flex items-center w-full py-4">
+                  <p style={{ ...ZN, fontWeight: 600, fontSize: 12, letterSpacing: '0.06em', textTransform: 'uppercase', color: '#111', flex: 1 }}>Description</p>
+                  <CaretDown size={14} weight="bold" color="#8a7f72" style={{ transform: showDesc ? 'rotate(180deg)' : 'none', transition: 'transform 0.2s' }} />
                 </button>
                 {showDesc && (
-                  <div className="px-5 pb-5">
-                    <p style={{ ...ZN, fontSize: 13, color: '#555', lineHeight: 1.65, whiteSpace: 'pre-wrap' }}>{product.description}</p>
+                  <div className="pb-5">
+                    <p style={{ ...ZN, fontSize: 14, color: '#555', lineHeight: 1.7, whiteSpace: 'pre-wrap' }}>{product.description}</p>
                   </div>
                 )}
               </div>
             )}
 
             {/* Q&A */}
-            <div className="mt-4 rounded-3xl bg-white p-5">
-              <p style={{ ...ZN, fontWeight: 700, fontSize: 13, color: '#111', marginBottom: 12 }}>Questions & Answers</p>
+            <div className="mt-4 p-5" style={{ background: 'white', borderRadius: 8, border: '1px solid #e0dbd2' }}>
+              <p style={{ ...ZN, fontWeight: 700, fontSize: 11, letterSpacing: '0.08em', textTransform: 'uppercase', color: '#8a7f72', marginBottom: 12 }}>Questions & Answers</p>
               {qaItems.length > 0 && (
                 <div className="flex flex-col gap-4 mb-5">
                   {qaItems.map(qa => (
@@ -497,7 +499,7 @@ export default function ProductDetailPage() {
 
       {/* ── Mobile: fixed bottom CTA ── */}
       <div className="md:hidden fixed bottom-0 left-0 right-0 px-4 py-4 flex gap-3"
-        style={{ background: 'white', borderTop: '1px solid #eee' }}>
+        style={{ background: '#faf9f7', borderTop: '1px solid #e0dbd2' }}>
         <button onClick={startChat} disabled={startingChat}
           className="flex items-center gap-2 px-4 py-3.5 rounded-2xl font-semibold text-sm flex-shrink-0"
           style={{ ...ZN, background: '#f0f0f0', color: '#333' }}>

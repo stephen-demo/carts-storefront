@@ -240,45 +240,21 @@ export default function StorePage() {
         {selectedFont && <link rel="stylesheet" href={fontGoogleUrl(selectedFont)} />}
         <style>{`@keyframes sfTicker{from{transform:translateX(0)}to{transform:translateX(-50%)}}`}</style>
 
-        {/* ── Desktop header ── */}
+        {/* ── Header ── */}
         <header className="sticky top-0 z-20"
           style={{ background: theme.header.bg, borderBottom: `1px solid ${theme.header.border}` }}>
-          <div className="max-w-7xl mx-auto px-4 md:px-8 flex items-center gap-4 py-3">
-            <h1 className="flex-1" style={{ fontFamily: theme.header.nameFont, fontWeight: theme.header.nameWeight, fontSize: theme.header.nameFontSize, color: theme.header.text, letterSpacing: '0.02em' }}>
+
+          {/* Mobile header: [SearchIcon]  STORE NAME  [Saved][Cart] */}
+          <div className="md:hidden flex items-center px-4 py-3 relative">
+            <button onClick={() => setShowSearch(s => !s)} className="w-9 h-9 rounded-full flex items-center justify-center flex-shrink-0"
+              style={{ background: theme.header.iconBg }}>
+              <MagnifyingGlass size={16} weight="bold" color={theme.header.text} />
+            </button>
+            <h1 className="absolute left-0 right-0 text-center pointer-events-none"
+              style={{ fontFamily: theme.header.nameFont, fontWeight: theme.header.nameWeight, fontSize: theme.header.nameFontSize, color: theme.header.text, letterSpacing: '0.08em' }}>
               {store.storeName?.toUpperCase()}
             </h1>
-
-            {/* Desktop: inline search */}
-            <div className="hidden md:flex items-center gap-2 rounded-full px-4 py-2"
-              style={{ background: theme.search.bg, border: `1px solid ${theme.search.border}`, minWidth: 240 }}>
-              <MagnifyingGlass size={14} color={theme.search.iconColor} />
-              <input className="bg-transparent text-sm outline-none flex-1"
-                placeholder="Search products…"
-                value={search} onChange={e => setSearch(e.target.value)}
-                style={{ ...ZN, color: theme.search.text }} />
-              {search && <button onClick={() => setSearch('')}><X size={12} color={theme.search.iconColor} /></button>}
-            </div>
-
-            {/* Category tabs — desktop only */}
-            <div className="hidden lg:flex gap-2 overflow-x-auto" style={{ scrollbarWidth: 'none' }}>
-              {categories.map(cat => (
-                <button key={cat} onClick={() => setActiveCategory(cat)}
-                  className="px-3 py-1.5 rounded-full text-sm"
-                  style={{ fontFamily: theme.section.font, fontWeight: activeCategory === cat ? 700 : 500,
-                    background: activeCategory === cat ? theme.tab.activeBg : theme.tab.bg,
-                    color: activeCategory === cat ? theme.tab.activeText : theme.tab.text,
-                    whiteSpace: 'nowrap', flexShrink: 0 }}>
-                  {cat}
-                </button>
-              ))}
-            </div>
-
-            {/* Icon buttons */}
-            <div className="flex items-center gap-2">
-              <button onClick={() => setShowSearch(s => !s)} className="md:hidden w-9 h-9 rounded-full flex items-center justify-center"
-                style={{ background: theme.header.iconBg }}>
-                <MagnifyingGlass size={16} weight="bold" color={theme.header.text} />
-              </button>
+            <div className="ml-auto flex items-center gap-2">
               <button onClick={() => router.push(`/${handle}/saved`)} className="relative w-9 h-9 rounded-full flex items-center justify-center"
                 style={{ background: theme.header.iconBg }}>
                 <Heart size={16} weight={saved.length ? 'fill' : 'regular'} color={saved.length ? '#ef4444' : theme.header.text} />
@@ -292,7 +268,48 @@ export default function StorePage() {
             </div>
           </div>
 
-          {/* Mobile search bar */}
+          {/* Desktop header */}
+          <div className="hidden md:flex max-w-7xl mx-auto px-8 items-center gap-4 py-3">
+            <h1 className="flex-1" style={{ fontFamily: theme.header.nameFont, fontWeight: theme.header.nameWeight, fontSize: theme.header.nameFontSize, color: theme.header.text, letterSpacing: '0.06em' }}>
+              {store.storeName?.toUpperCase()}
+            </h1>
+            <div className="flex items-center gap-2 rounded-full px-4 py-2"
+              style={{ background: theme.search.bg, border: `1px solid ${theme.search.border}`, minWidth: 240 }}>
+              <MagnifyingGlass size={14} color={theme.search.iconColor} />
+              <input className="bg-transparent text-sm outline-none flex-1"
+                placeholder="Search products…"
+                value={search} onChange={e => setSearch(e.target.value)}
+                style={{ ...ZN, color: theme.search.text }} />
+              {search && <button onClick={() => setSearch('')}><X size={12} color={theme.search.iconColor} /></button>}
+            </div>
+            <div className="hidden lg:flex gap-5 overflow-x-auto" style={{ scrollbarWidth: 'none' }}>
+              {categories.map(cat => (
+                <button key={cat} onClick={() => setActiveCategory(cat)}
+                  className="pb-1 text-sm"
+                  style={{ fontFamily: theme.section.font, fontWeight: activeCategory === cat ? 700 : 500,
+                    background: 'transparent',
+                    borderBottom: `2px solid ${activeCategory === cat ? theme.section.color : 'transparent'}`,
+                    color: activeCategory === cat ? theme.section.color : theme.section.subColor,
+                    whiteSpace: 'nowrap', flexShrink: 0, paddingLeft: 2, paddingRight: 2 }}>
+                  {cat}
+                </button>
+              ))}
+            </div>
+            <div className="flex items-center gap-2">
+              <button onClick={() => router.push(`/${handle}/saved`)} className="relative w-9 h-9 rounded-full flex items-center justify-center"
+                style={{ background: theme.header.iconBg }}>
+                <Heart size={16} weight={saved.length ? 'fill' : 'regular'} color={saved.length ? '#ef4444' : theme.header.text} />
+                {saved.length > 0 && <span className="absolute -top-1 -right-1 w-4 h-4 rounded-full flex items-center justify-center" style={{ background: '#ef4444', fontSize: 9, fontWeight: 700, color: 'white' }}>{saved.length > 9 ? '9+' : saved.length}</span>}
+              </button>
+              <button onClick={() => router.push(`/${handle}/cart`)} className="relative w-9 h-9 rounded-full flex items-center justify-center"
+                style={{ background: theme.header.iconBg }}>
+                <ShoppingBag size={16} weight={cartItemCount > 0 ? 'fill' : 'regular'} color={theme.header.text} />
+                {cartItemCount > 0 && <span className="absolute -top-1 -right-1 w-4 h-4 rounded-full flex items-center justify-center" style={{ background: '#111', fontSize: 9, fontWeight: 700, color: 'white' }}>{cartItemCount > 9 ? '9+' : cartItemCount}</span>}
+              </button>
+            </div>
+          </div>
+
+          {/* Mobile search bar (slides in) */}
           {showSearch && (
             <div className="md:hidden flex gap-2 items-center px-4 py-3"
               style={{ background: theme.header.bg, borderBottom: `1px solid ${theme.header.border}` }}>
@@ -312,14 +329,15 @@ export default function StorePage() {
             </div>
           )}
 
-          {/* Mobile category tabs */}
-          <div className="lg:hidden flex gap-2 px-4 py-2 overflow-x-auto" style={{ scrollbarWidth: 'none' }}>
+          {/* Mobile category tabs — underline style */}
+          <div className="lg:hidden flex gap-5 px-4 py-2 overflow-x-auto" style={{ scrollbarWidth: 'none', borderTop: `1px solid ${theme.header.border}` }}>
             {categories.map(cat => (
               <button key={cat} onClick={() => setActiveCategory(cat)}
-                className="px-4 py-1.5 rounded-full text-sm"
+                className="pb-1.5 text-sm"
                 style={{ fontFamily: theme.section.font, fontWeight: activeCategory === cat ? 700 : 500,
-                  background: activeCategory === cat ? theme.tab.activeBg : theme.tab.bg,
-                  color: activeCategory === cat ? theme.tab.activeText : theme.tab.text,
+                  background: 'transparent',
+                  borderBottom: `2px solid ${activeCategory === cat ? theme.section.color : 'transparent'}`,
+                  color: activeCategory === cat ? theme.section.color : theme.section.subColor,
                   whiteSpace: 'nowrap', flexShrink: 0 }}>
                 {cat}
               </button>
@@ -340,13 +358,13 @@ export default function StorePage() {
           ) : (
             <>
               {showingAll && !hasBlocks && (
-                <div className="mt-6 rounded-3xl overflow-hidden relative"
-                  style={{ height: 220, background: 'linear-gradient(135deg, #1c1c1e 0%, #2a2a2e 60%, #111 100%)' }}>
-                  <div className="absolute -top-10 -right-10 w-48 h-48 rounded-full" style={{ background: 'rgba(230,253,83,0.12)' }} />
-                  <div className="absolute -bottom-14 -left-8 w-56 h-56 rounded-full" style={{ background: 'rgba(230,253,83,0.07)' }} />
+                <div className="mt-6 overflow-hidden relative"
+                  style={{ height: 200, background: theme.card.imgBg, borderRadius: theme.card.radius || 8 }}>
                   <div className="absolute inset-0 p-6 flex flex-col justify-end">
-                    <span style={{ ...ZN, fontSize: 11, color: 'rgba(255,255,255,0.5)', textTransform: 'uppercase', letterSpacing: '0.1em' }}>{store.storeName}</span>
-                    <h2 style={{ ...ZE, fontWeight: 800, fontSize: 26, color: 'white', marginTop: 4, lineHeight: 1.2 }}>Welcome to our store</h2>
+                    <span style={{ fontFamily: theme.section.font, fontSize: 11, color: theme.section.subColor, textTransform: 'uppercase', letterSpacing: '0.1em' }}>{store.storeName}</span>
+                    <h2 style={{ fontFamily: theme.section.font, fontWeight: theme.section.weight, fontSize: 24, color: theme.section.color, marginTop: 6, lineHeight: 1.2 }}>
+                      {store.tagline || 'Shop our collection'}
+                    </h2>
                   </div>
                 </div>
               )}
@@ -609,13 +627,13 @@ function CategoriesBlock({ block, categories, activeFilter, setActiveFilter }) {
   return (
     <section className="mt-6">
       {block.title && <h2 style={{ fontFamily: theme.section.font, fontWeight: theme.section.weight, fontSize: 16, color: theme.section.color, marginBottom: 10 }}>{block.title}</h2>}
-      <div className="flex gap-2 flex-wrap">
+      <div className="flex gap-5 overflow-x-auto" style={{ scrollbarWidth: 'none' }}>
         {activeFilter && (
-          <button onClick={() => setActiveFilter(null)} style={{ fontFamily: theme.section.font, fontSize: 13, fontWeight: 600, padding: '8px 14px', borderRadius: 100, background: theme.tab.bg, color: theme.tab.text }}>All</button>
+          <button onClick={() => setActiveFilter(null)} style={{ fontFamily: theme.section.font, fontSize: 13, fontWeight: 500, background: 'transparent', borderBottom: '2px solid transparent', paddingBottom: 6, color: theme.section.subColor }}>All</button>
         )}
         {visible.map(cat => (
           <button key={cat} onClick={() => setActiveFilter(activeFilter === cat ? null : cat)}
-            style={{ fontFamily: theme.section.font, fontSize: 13, fontWeight: activeFilter === cat ? 700 : 500, padding: '8px 14px', borderRadius: 100, background: activeFilter === cat ? theme.tab.activeBg : theme.tab.bg, color: activeFilter === cat ? theme.tab.activeText : theme.tab.text }}>
+            style={{ fontFamily: theme.section.font, fontSize: 13, fontWeight: activeFilter === cat ? 700 : 500, background: 'transparent', borderBottom: `2px solid ${activeFilter === cat ? theme.section.color : 'transparent'}`, paddingBottom: 6, color: activeFilter === cat ? theme.section.color : theme.section.subColor, whiteSpace: 'nowrap', flexShrink: 0 }}>
             {cat}
           </button>
         ))}
@@ -634,7 +652,7 @@ function FeaturedBlock({ block, products, cardProps }) {
   if (!product) return null
   return (
     <section className="mt-8">
-      {block.title && <h2 style={{ fontFamily: "'Zalando Sans'", fontWeight: 700, fontSize: 16, color: '#111', marginBottom: 10 }}>{block.title}</h2>}
+      {block.title && <h2 style={{ fontFamily: theme.section.font, fontWeight: theme.section.weight, fontSize: 16, color: theme.section.color, marginBottom: 10 }}>{block.title}</h2>}
       <div style={{ maxWidth: 280 }}>
         <ProductCard {...cardProps(product)} />
       </div>
@@ -661,9 +679,9 @@ function ProductCard({ product, isSaved, inCart, onSave, onCart, onClick, compac
   const images = product.images?.length > 0 ? product.images : [null]
 
   return (
-    <div className={compact ? 'flex-shrink-0 cursor-pointer' : 'cursor-pointer'} style={compact ? { width: 155 } : undefined}>
+    <div className={compact ? 'flex-shrink-0 cursor-pointer' : 'cursor-pointer'} style={compact ? { width: 160 } : undefined}>
       <div className="relative overflow-hidden"
-        style={{ aspectRatio: '3/4', background: theme.card.imgBg, borderRadius: theme.card.radius }}
+        style={{ aspectRatio: '1/1', background: theme.card.imgBg, borderRadius: theme.card.radius }}
         onTouchStart={e => { touchStartX.current = e.touches[0].clientX; touchStartY.current = e.touches[0].clientY; isDragging.current = false }}
         onTouchMove={e => {
           const dx = Math.abs(e.touches[0].clientX - touchStartX.current)

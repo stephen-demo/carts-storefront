@@ -1,16 +1,49 @@
 'use client'
 import { useState, useEffect } from 'react'
 import { useParams, useRouter } from 'next/navigation'
-import { ArrowLeft, Trash } from '@phosphor-icons/react'
-import { ZE, ZN, ZSC } from '../../../lib/styles'
+import { Trash } from '@phosphor-icons/react'
 
 const formatPrice = (amount) => `₦${Number(amount).toLocaleString('en-NG')}`
 const cartKey = (handle) => `carts_cart_${handle}`
 
+const STEPS = ['Bag', 'Delivery', 'Payment', 'Done']
+
+function StepBar({ current }) {
+  return (
+    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '16px 24px', gap: 0 }}>
+      {STEPS.map((step, i) => (
+        <div key={step} style={{ display: 'flex', alignItems: 'center' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 5 }}>
+            <div style={{
+              width: 28, height: 28, borderRadius: '50%',
+              background: i === current ? '#111' : i < current ? '#111' : 'transparent',
+              border: `1.5px solid ${i <= current ? '#111' : '#ccc'}`,
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              fontSize: 11, fontWeight: 700,
+              color: i <= current ? 'white' : '#bbb',
+            }}>
+              {i < current ? (
+                <svg width="10" height="10" viewBox="0 0 10 10" fill="none">
+                  <path d="M2 5.5L4 7.5L8 3" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                </svg>
+              ) : i + 1}
+            </div>
+            <span style={{ fontSize: 9, color: i === current ? '#111' : '#bbb', fontWeight: i === current ? 700 : 400, letterSpacing: '0.06em', textTransform: 'uppercase', whiteSpace: 'nowrap' }}>
+              {step}
+            </span>
+          </div>
+          {i < STEPS.length - 1 && (
+            <div style={{ width: 36, height: 1, background: i < current ? '#111' : '#ddd', margin: '0 4px', marginBottom: 16, flexShrink: 0 }} />
+          )}
+        </div>
+      ))}
+    </div>
+  )
+}
+
 export default function CartPage() {
   const { handle } = useParams()
   const router = useRouter()
-
   const [items, setItems] = useState([])
 
   useEffect(() => {
@@ -32,90 +65,121 @@ export default function CartPage() {
   }
 
   const removeItem = (i) => setItems(prev => prev.filter((_, idx) => idx !== i))
-
   const subtotal = items.reduce((sum, item) => sum + item.price * item.qty, 0)
 
   if (items.length === 0) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-screen gap-6 px-6" style={{ background: '#f5f5f5' }}>
-        <div className="text-center">
-          <p style={{ ...ZE, fontSize: 16, fontWeight: 700, color: '#111', marginBottom: 6 }}>Your cart is empty</p>
-          <p style={{ ...ZN, fontSize: 14, color: '#999' }}>Add some items to get started.</p>
+      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: '100vh', gap: 24, padding: '0 24px', background: '#f5f2ee' }}>
+        <div style={{ textAlign: 'center' }}>
+          <p style={{ fontFamily: 'Georgia, serif', fontSize: 20, fontWeight: 700, color: '#111', marginBottom: 8 }}>Your bag is empty</p>
+          <p style={{ fontSize: 14, color: '#8a7f72' }}>Add items to your bag to continue.</p>
         </div>
-        <button onClick={() => router.push(`/${handle}`)} className="px-6 py-3 rounded-full"
-          style={{ background: '#111', ...ZN, fontWeight: 700, fontSize: 14, color: 'white' }}>
-          Browse store →
+        <button onClick={() => router.push(`/${handle}`)}
+          style={{ padding: '14px 32px', background: '#111', color: 'white', borderRadius: 6, fontSize: 13, fontWeight: 700, letterSpacing: '0.08em', border: 'none', cursor: 'pointer' }}>
+          BROWSE STORE
         </button>
       </div>
     )
   }
 
   return (
-    <div className="min-h-screen" style={{ background: '#f5f5f5' }}>
-      <header className="sticky top-0 z-10 flex items-center gap-3 px-4 py-4"
-        style={{ background: 'white', borderBottom: '1px solid #eee' }}>
-        <button onClick={() => router.back()} className="w-9 h-9 rounded-full flex items-center justify-center" style={{ background: '#f0f0f0' }}>
-          <ArrowLeft size={18} color="#333" />
-        </button>
-        <div>
-          <p style={{ ...ZE, fontWeight: 700, fontSize: 16, color: '#111' }}>
-            My Cart <span style={{ fontWeight: 400, color: '#999', fontSize: 14 }}>({items.length} {items.length === 1 ? 'item' : 'items'})</span>
-          </p>
+    <div style={{ minHeight: '100vh', background: '#f5f2ee' }}>
+      {/* Header */}
+      <header style={{ position: 'sticky', top: 0, zIndex: 20, background: '#faf9f7', borderBottom: '1px solid #e0dbd2' }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '14px 20px', maxWidth: 640, margin: '0 auto' }}>
+          <button onClick={() => router.back()}
+            style={{ fontSize: 13, fontWeight: 600, color: '#8a7f72', background: 'none', border: 'none', cursor: 'pointer', letterSpacing: '0.02em' }}>
+            ← Back
+          </button>
+          <h1 style={{ fontFamily: 'system-ui, sans-serif', fontWeight: 700, fontSize: 13, letterSpacing: '0.12em', color: '#111', textTransform: 'uppercase', margin: 0 }}>
+            Shopping Bag
+          </h1>
+          <button onClick={() => router.push(`/${handle}`)}
+            style={{ fontSize: 13, fontWeight: 600, color: '#8a7f72', background: 'none', border: 'none', cursor: 'pointer' }}>
+            Edit
+          </button>
         </div>
+        <StepBar current={0} />
       </header>
 
-      <div className="max-w-2xl mx-auto px-4 pt-4 pb-36 flex flex-col gap-3">
-        {items.map((item, i) => (
-          <div key={`${item.productId}-${i}`} className="flex items-start gap-3 p-3 rounded-2xl" style={{ background: 'white' }}>
-            <div className="w-16 rounded-xl overflow-hidden flex-shrink-0" style={{ aspectRatio: '3/4', background: '#e8e8e8' }}>
-              {item.image && <img src={item.image} alt={item.name} className="w-full h-full object-cover" loading="lazy" />}
-            </div>
-            <div className="flex-1 min-w-0">
-              <p className="text-ellipsis overflow-hidden whitespace-nowrap" style={{ ...ZN, fontSize: 13, fontWeight: 600, color: '#111' }}>{item.name}</p>
-              {(item.size || item.color) && (
-                <p style={{ ...ZN, fontSize: 12, color: '#999', marginTop: 2 }}>{[item.size, item.color].filter(Boolean).join(' · ')}</p>
-              )}
-              <p style={{ ...ZSC, fontSize: 14, fontWeight: 700, color: '#111', marginTop: 4 }}>{formatPrice(item.price * item.qty)}</p>
-              <div className="flex items-center justify-between mt-3">
-                <div className="flex items-center gap-3 px-2 py-1 rounded-full" style={{ background: '#f0f0f0' }}>
-                  <button onClick={() => updateQty(i, -1)} className="w-7 h-7 rounded-full flex items-center justify-center" style={{ background: '#e0e0e0' }}>
-                    <span style={{ fontSize: 16, color: '#333', lineHeight: 1 }}>−</span>
-                  </button>
-                  <span style={{ ...ZN, fontWeight: 700, fontSize: 14, color: '#111', minWidth: 16, textAlign: 'center' }}>{item.qty}</span>
-                  <button onClick={() => updateQty(i, 1)} className="w-7 h-7 rounded-full flex items-center justify-center" style={{ background: '#e0e0e0' }}>
-                    <span style={{ fontSize: 16, color: '#333', lineHeight: 1 }}>+</span>
-                  </button>
-                </div>
-                <button onClick={() => removeItem(i)}><Trash size={18} color="#bbb" /></button>
+      <div style={{ maxWidth: 640, margin: '0 auto', padding: '16px 16px 160px' }}>
+        {/* Cart items */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+          {items.map((item, i) => (
+            <div key={`${item.productId}-${i}`} style={{ display: 'flex', alignItems: 'flex-start', gap: 16, padding: '20px 0', borderBottom: '1px solid #e0dbd2' }}>
+              {/* Square thumbnail */}
+              <div style={{ width: 80, height: 80, background: '#ece8e2', borderRadius: 4, overflow: 'hidden', flexShrink: 0 }}>
+                {item.image && <img src={item.image} alt={item.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} loading="lazy" />}
               </div>
-            </div>
-          </div>
-        ))}
 
-        <div className="p-4 rounded-2xl" style={{ background: 'white' }}>
-          <p style={{ ...ZN, fontSize: 12, fontWeight: 700, color: '#111', marginBottom: 12 }}>Order Summary</p>
-          <div className="flex flex-col gap-3">
-            <div className="flex justify-between">
-              <span style={{ ...ZN, fontSize: 14, color: '#666' }}>Subtotal</span>
-              <span style={{ ...ZSC, fontSize: 14, fontWeight: 600, color: '#111' }}>{formatPrice(subtotal)}</span>
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <p style={{ fontSize: 10, color: '#8a7f72', letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: 3 }}>
+                  {item.brand || 'STORE ITEM'}
+                </p>
+                <p style={{ fontSize: 14, fontWeight: 600, color: '#111', fontFamily: 'Georgia, serif', lineHeight: 1.3, marginBottom: 4 }}>{item.name}</p>
+                {(item.size || item.color) && (
+                  <p style={{ fontSize: 12, color: '#8a7f72', marginBottom: 12 }}>
+                    {[item.color && `Color: ${item.color}`, item.size && `Size: ${item.size}`].filter(Boolean).join('  ')}
+                  </p>
+                )}
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                  {/* Qty controls */}
+                  <div style={{ display: 'flex', alignItems: 'center', border: '1px solid #e0dbd2', borderRadius: 4, overflow: 'hidden' }}>
+                    <button onClick={() => updateQty(i, -1)}
+                      style={{ width: 32, height: 32, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'transparent', border: 'none', color: '#555', fontSize: 16, cursor: 'pointer' }}>
+                      −
+                    </button>
+                    <span style={{ width: 28, textAlign: 'center', fontSize: 13, fontWeight: 600, color: '#111' }}>{item.qty}</span>
+                    <button onClick={() => updateQty(i, 1)}
+                      style={{ width: 32, height: 32, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'transparent', border: 'none', color: '#555', fontSize: 16, cursor: 'pointer' }}>
+                      +
+                    </button>
+                  </div>
+                  <p style={{ fontSize: 15, fontWeight: 700, color: '#111', fontFamily: 'Georgia, serif' }}>{formatPrice(item.price * item.qty)}</p>
+                </div>
+              </div>
+
+              {/* Remove */}
+              <button onClick={() => removeItem(i)} style={{ background: 'transparent', border: 'none', padding: 4, cursor: 'pointer', marginTop: 2 }}>
+                <Trash size={16} color="#c8c2b8" />
+              </button>
             </div>
-            <div style={{ height: 1, background: '#eee' }} />
-            <div className="flex justify-between">
-              <span style={{ ...ZN, fontSize: 14, fontWeight: 700, color: '#111' }}>Total</span>
-              <span style={{ ...ZSC, fontSize: 16, fontWeight: 700, color: '#111' }}>{formatPrice(subtotal)}</span>
+          ))}
+        </div>
+
+        {/* Order summary */}
+        <div style={{ marginTop: 24, background: 'white', borderRadius: 8, padding: '20px 20px', border: '1px solid #e0dbd2' }}>
+          <p style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.1em', color: '#8a7f72', textTransform: 'uppercase', marginBottom: 16 }}>Order Summary</p>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+              <span style={{ fontSize: 14, color: '#555' }}>Subtotal</span>
+              <span style={{ fontSize: 14, fontWeight: 600, color: '#111' }}>{formatPrice(subtotal)}</span>
+            </div>
+            <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+              <span style={{ fontSize: 14, color: '#555' }}>Delivery</span>
+              <span style={{ fontSize: 14, color: '#8a7f72' }}>Calculated at checkout</span>
+            </div>
+            <div style={{ height: 1, background: '#e0dbd2', margin: '4px 0' }} />
+            <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+              <span style={{ fontSize: 15, fontWeight: 700, color: '#111', fontFamily: 'Georgia, serif' }}>Estimated Total</span>
+              <span style={{ fontSize: 16, fontWeight: 700, color: '#111', fontFamily: 'Georgia, serif' }}>{formatPrice(subtotal)}</span>
             </div>
           </div>
         </div>
       </div>
 
-      <div className="fixed bottom-0 left-0 right-0 px-4 pt-4 pb-8 max-w-2xl mx-auto"
-        style={{ background: 'linear-gradient(to top, #f5f5f5 80%, transparent)' }}>
-        <button
-          onClick={() => router.push(`/${handle}/checkout`)}
-          className="w-full py-4 rounded-full"
-          style={{ background: '#e6fd53', ...ZE, fontWeight: 700, fontSize: 16, color: '#060806' }}>
-          Checkout →
-        </button>
+      {/* Fixed footer CTA */}
+      <div style={{ position: 'fixed', bottom: 0, left: 0, right: 0, background: '#faf9f7', borderTop: '1px solid #e0dbd2', padding: '16px 20px 32px', maxWidth: 640, margin: '0 auto' }}>
+        <div style={{ maxWidth: 640, margin: '0 auto' }}>
+          <button onClick={() => router.push(`/${handle}/checkout`)}
+            style={{ width: '100%', padding: '16px', background: '#111', color: 'white', borderRadius: 6, fontSize: 13, fontWeight: 700, letterSpacing: '0.08em', border: 'none', cursor: 'pointer', display: 'block' }}>
+            PROCEED TO CHECKOUT
+          </button>
+          <button onClick={() => router.push(`/${handle}`)}
+            style={{ display: 'block', width: '100%', marginTop: 12, textAlign: 'center', fontSize: 13, color: '#8a7f72', background: 'none', border: 'none', cursor: 'pointer', textDecoration: 'underline', textUnderlineOffset: 3 }}>
+            Continue Shopping
+          </button>
+        </div>
       </div>
     </div>
   )
