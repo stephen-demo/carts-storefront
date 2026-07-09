@@ -273,5 +273,7 @@ export async function POST(request) {
     }
   }
 
+  if (type === 'ping') return Response.json({ ok: true, v: 3 })
+
   return Response.json({ error: 'Unknown type' }, { status: 400 })
 }
