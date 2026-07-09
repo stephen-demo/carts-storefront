@@ -36,6 +36,7 @@ export default function ProductDetailPage() {
   const [qty, setQty]           = useState(1)
   const [selectedSize, setSelectedSize]   = useState(null)
   const [selectedColor, setSelectedColor] = useState(null)
+  const [selectedExtras, setSelectedExtras] = useState([])
   const [imgIndex, setImgIndex] = useState(0)
   const [showDesc, setShowDesc] = useState(false)
   const [question, setQuestion] = useState('')
@@ -92,14 +93,17 @@ export default function ProductDetailPage() {
     setSaved(!saved)
   }
 
+  const extrasTotal = selectedExtras.reduce((s, e) => s + (e.price || 0), 0)
+
   const addToCart = () => {
     const key = cartKey(handle)
     const cart = JSON.parse(localStorage.getItem(key) || '[]')
-    const existingIdx = cart.findIndex(i => i.productId === productId && i.size === selectedSize && i.color === selectedColor)
+    const existingIdx = cart.findIndex(i => i.productId === productId && i.size === selectedSize && i.color === selectedColor
+      && JSON.stringify(i.selectedExtras || []) === JSON.stringify(selectedExtras))
     if (existingIdx >= 0) {
       cart[existingIdx].qty += qty
     } else {
-      cart.push({ productId, name: product.name, price: product.price, image: product.images?.[0] || null, qty, size: selectedSize, color: selectedColor })
+      cart.push({ productId, name: product.name, price: product.price, image: product.images?.[0] || null, qty, size: selectedSize, color: selectedColor, selectedExtras })
     }
     localStorage.setItem(key, JSON.stringify(cart))
     setCartQty(qty); setAddAnim(true)
@@ -292,7 +296,12 @@ export default function ProductDetailPage() {
             <h1 style={{ fontFamily: 'Georgia, serif', fontWeight: 700, fontSize: 24, color: '#111', lineHeight: 1.3 }}>{product.name}</h1>
 
             <div className="flex items-baseline gap-3 mt-3">
-              <p style={{ fontFamily: 'Georgia, serif', fontWeight: 700, fontSize: 24, color: '#111' }}>{formatPrice(product.price)}</p>
+              <p style={{ fontFamily: 'Georgia, serif', fontWeight: 700, fontSize: 24, color: '#111' }}>
+                {formatPrice(product.price + extrasTotal)}
+              </p>
+              {extrasTotal > 0 && (
+                <p style={{ ...ZN, fontSize: 13, color: '#999', textDecoration: 'line-through' }}>{formatPrice(product.price)}</p>
+              )}
             </div>
 
             <p className="mt-1" style={{ ...ZN, fontSize: 12, fontWeight: 600,
@@ -336,6 +345,41 @@ export default function ProductDetailPage() {
                       {size}
                     </button>
                   ))}
+                </div>
+              </div>
+            )}
+
+            {/* Extras */}
+            {product.extras?.length > 0 && (
+              <div className="mt-5">
+                <p style={{ ...ZN, fontSize: 11, color: '#999', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 8 }}>
+                  Add-ons
+                </p>
+                <div className="flex flex-col gap-2">
+                  {product.extras.map(ex => {
+                    const active = selectedExtras.some(e => e.id === ex.id)
+                    return (
+                      <button key={ex.id} type="button"
+                        onClick={() => setSelectedExtras(prev =>
+                          active ? prev.filter(e => e.id !== ex.id) : [...prev, ex]
+                        )}
+                        className="flex items-center justify-between px-4 py-3 rounded-2xl text-left w-full"
+                        style={{
+                          background: active ? '#f5f2ee' : '#f8f6f3',
+                          border: active ? '2px solid #111' : '1.5px solid #e0dbd2',
+                        }}
+                      >
+                        <div className="flex items-center gap-2.5">
+                          <div className="w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0"
+                            style={{ background: active ? '#111' : 'transparent', border: active ? 'none' : '1.5px solid #bbb' }}>
+                            {active && <span style={{ color: 'white', fontSize: 10, fontWeight: 700 }}>✓</span>}
+                          </div>
+                          <span style={{ ...ZN, fontSize: 14, fontWeight: active ? 600 : 400, color: '#111' }}>{ex.label}</span>
+                        </div>
+                        <span style={{ ...ZN, fontSize: 14, fontWeight: 700, color: active ? '#111' : '#888' }}>+{formatPrice(ex.price)}</span>
+                      </button>
+                    )
+                  })}
                 </div>
               </div>
             )}

@@ -98,7 +98,8 @@ export default function CheckoutPage() {
   const set = (key, val) => setForm(prev => ({ ...prev, [key]: val }))
 
   const deliveryOption    = DELIVERY_OPTIONS.find(d => d.id === form.delivery)
-  const itemsTotal        = cartItems.reduce((s, i) => s + (i.price ?? 0) * (i.qty ?? 1), 0)
+  const itemExtrasTotal   = (item) => (item.selectedExtras || []).reduce((s, e) => s + (e.price || 0), 0)
+  const itemsTotal        = cartItems.reduce((s, i) => s + ((i.price ?? 0) + itemExtrasTotal(i)) * (i.qty ?? 1), 0)
   const deliveryFee       = deliveryOption?.price || 0
   const discount          = calcDiscount(appliedDeal, cartItems, itemsTotal, deliveryFee)
   const effectiveDelivery = appliedDeal?.dealType === 'free_ship' ? 0 : deliveryFee
@@ -149,16 +150,31 @@ export default function CheckoutPage() {
         updateDoc(doc(db, 'stores', storeUid, 'deals', appliedDeal.id), { usedCount: increment(1) }).catch(() => {})
       }
 
+      const NOTIFY = 'https://carts.ng/api/notify'
+      const storeName = storeData.storeName || handle
+
       const notifPrefs = storeData?.notifPrefs ?? {}
       if (notifPrefs.newOrders !== false && storeData?.email) {
-        fetch('https://app.carts.ng/api/notify', {
+        fetch(NOTIFY, {
           method: 'POST', headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             type: 'merchant-order', merchantEmail: storeData.email,
-            storeName: storeData.storeName || handle, storeHandle: handle,
+            storeName, storeHandle: handle,
             orderId: ref.id, buyerName: form.name.trim(), buyerPhone: form.phone,
             delivery: form.delivery, items: cartItems, total, discount,
             dealName: appliedDeal?.name || '', paymentMethod,
+          }),
+        }).catch(() => {})
+      }
+
+      if (form.email?.trim()) {
+        fetch(NOTIFY, {
+          method: 'POST', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            type: 'buyer-order', buyerEmail: form.email.trim(),
+            buyerName: form.name.trim(), storeName, handle,
+            orderId: ref.id, items: cartItems, total, deliveryFee: deliveryPrice,
+            discount, delivery: form.delivery, paymentMethod,
           }),
         }).catch(() => {})
       }

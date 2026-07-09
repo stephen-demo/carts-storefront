@@ -65,7 +65,10 @@ export default function CartPage() {
   }
 
   const removeItem = (i) => setItems(prev => prev.filter((_, idx) => idx !== i))
-  const subtotal = items.reduce((sum, item) => sum + item.price * item.qty, 0)
+
+  const itemExtrasTotal = (item) => (item.selectedExtras || []).reduce((s, e) => s + (e.price || 0), 0)
+  const itemTotal = (item) => (item.price + itemExtrasTotal(item)) * item.qty
+  const subtotal = items.reduce((sum, item) => sum + itemTotal(item), 0)
 
   if (items.length === 0) {
     return (
@@ -118,11 +121,18 @@ export default function CartPage() {
                 </p>
                 <p style={{ fontSize: 14, fontWeight: 600, color: '#111', fontFamily: 'Georgia, serif', lineHeight: 1.3, marginBottom: 4 }}>{item.name}</p>
                 {(item.size || item.color) && (
-                  <p style={{ fontSize: 12, color: '#8a7f72', marginBottom: 12 }}>
+                  <p style={{ fontSize: 12, color: '#8a7f72', marginBottom: 6 }}>
                     {[item.color && `Color: ${item.color}`, item.size && `Size: ${item.size}`].filter(Boolean).join('  ')}
                   </p>
                 )}
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                {item.selectedExtras?.length > 0 && (
+                  <div style={{ marginBottom: 10 }}>
+                    {item.selectedExtras.map(ex => (
+                      <p key={ex.id} style={{ fontSize: 12, color: '#8a7f72' }}>+ {ex.label} ({formatPrice(ex.price)})</p>
+                    ))}
+                  </div>
+                )}
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: 6 }}>
                   {/* Qty controls */}
                   <div style={{ display: 'flex', alignItems: 'center', border: '1px solid #e0dbd2', borderRadius: 4, overflow: 'hidden' }}>
                     <button onClick={() => updateQty(i, -1)}
@@ -135,7 +145,7 @@ export default function CartPage() {
                       +
                     </button>
                   </div>
-                  <p style={{ fontSize: 15, fontWeight: 700, color: '#111', fontFamily: 'Georgia, serif' }}>{formatPrice(item.price * item.qty)}</p>
+                  <p style={{ fontSize: 15, fontWeight: 700, color: '#111', fontFamily: 'Georgia, serif' }}>{formatPrice(itemTotal(item))}</p>
                 </div>
               </div>
 
