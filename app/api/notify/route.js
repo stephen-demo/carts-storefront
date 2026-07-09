@@ -1,15 +1,14 @@
 async function sendEmail({ to, subject, html }) {
   const key = process.env.RESEND_API_KEY
-  if (!key) {
-    console.warn('[notify] RESEND_API_KEY not set — skipping email')
-    return
-  }
+  if (!key) throw new Error('RESEND_API_KEY not configured in environment')
   const res = await fetch('https://api.resend.com/emails', {
     method: 'POST',
     headers: { Authorization: `Bearer ${key}`, 'Content-Type': 'application/json' },
     body: JSON.stringify({ from: 'Carts.ng <notifications@carts.ng>', to, subject, html }),
   })
-  if (!res.ok) throw new Error(await res.text())
+  const resText = await res.text()
+  if (!res.ok) throw new Error(`Resend ${res.status}: ${resText}`)
+  return resText
 }
 
 const fmt = (n) => `₦${Number(n || 0).toLocaleString('en-NG')}`
@@ -208,7 +207,7 @@ export async function POST(request) {
       return Response.json({ ok: true })
     } catch (err) {
       console.error('[notify] buyer-order error:', err)
-      return Response.json({ error: 'Failed', detail: err?.message }, { status: 500 })
+      return Response.json({ error: 'Failed', detail: String(err) }, { status: 500 })
     }
   }
 
@@ -242,7 +241,7 @@ export async function POST(request) {
       return Response.json({ ok: true })
     } catch (err) {
       console.error('[notify] merchant-order error:', err)
-      return Response.json({ error: 'Failed', detail: err?.message }, { status: 500 })
+      return Response.json({ error: 'Failed', detail: String(err) }, { status: 500 })
     }
   }
 
@@ -270,7 +269,7 @@ export async function POST(request) {
       return Response.json({ ok: true })
     } catch (err) {
       console.error('[notify] merchant-qa error:', err)
-      return Response.json({ error: 'Failed', detail: err?.message }, { status: 500 })
+      return Response.json({ error: 'Failed', detail: String(err) }, { status: 500 })
     }
   }
 
