@@ -208,7 +208,7 @@ export async function POST(request) {
       return Response.json({ ok: true })
     } catch (err) {
       console.error('[notify] buyer-order error:', err)
-      return Response.json({ error: 'Failed' }, { status: 500 })
+      return Response.json({ error: 'Failed', detail: err?.message }, { status: 500 })
     }
   }
 
@@ -242,7 +242,35 @@ export async function POST(request) {
       return Response.json({ ok: true })
     } catch (err) {
       console.error('[notify] merchant-order error:', err)
-      return Response.json({ error: 'Failed' }, { status: 500 })
+      return Response.json({ error: 'Failed', detail: err?.message }, { status: 500 })
+    }
+  }
+
+  if (type === 'merchant-qa') {
+    const { merchantEmail, storeName, storeHandle, productName, productId, question } = body
+    if (!merchantEmail || !question) {
+      return Response.json({ error: 'Missing fields' }, { status: 400 })
+    }
+    try {
+      await sendEmail({
+        to: merchantEmail,
+        subject: `New question about "${productName}" on your store`,
+        html: `
+          <div style="font-family:-apple-system,sans-serif;max-width:480px;margin:0 auto;padding:32px 24px;background:#fff;">
+            <p style="font-size:16px;font-weight:700;color:#111;margin:0 0 4px;">New customer question</p>
+            <p style="font-size:13px;color:#888;margin:0 0 20px;">On product: <strong>${productName}</strong></p>
+            <div style="background:#f5f5f5;border-radius:12px;padding:16px;margin:0 0 24px;">
+              <p style="font-size:15px;color:#111;margin:0;line-height:1.5;">${question}</p>
+            </div>
+            <a href="https://app.carts.ng/owner/qa/${productId}" style="display:inline-block;background:#111;color:#fff;padding:14px 28px;border-radius:99px;font-weight:700;text-decoration:none;font-size:14px;">Answer question →</a>
+            <p style="font-size:12px;color:#bbb;margin-top:32px;">Powered by <a href="https://carts.ng" style="color:#bbb;">Carts.ng</a></p>
+          </div>
+        `,
+      })
+      return Response.json({ ok: true })
+    } catch (err) {
+      console.error('[notify] merchant-qa error:', err)
+      return Response.json({ error: 'Failed', detail: err?.message }, { status: 500 })
     }
   }
 

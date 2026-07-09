@@ -173,7 +173,7 @@ export default function CheckoutPage() {
           body: JSON.stringify({
             type: 'buyer-order', buyerEmail: form.email.trim(),
             buyerName: form.name.trim(), storeName, handle,
-            orderId: ref.id, items: cartItems, total, deliveryFee: deliveryPrice,
+            orderId: ref.id, items: cartItems, total, deliveryFee: effectiveDelivery,
             discount, delivery: form.delivery, paymentMethod,
           }),
         }).catch(() => {})

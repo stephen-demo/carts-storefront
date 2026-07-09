@@ -189,6 +189,21 @@ export default function ProductDetailPage() {
         question: question.trim(), askedAt: serverTimestamp(),
         answered: false, public: true, buyerName: null,
       })
+      if (storeEmail) {
+        fetch('/api/notify', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            type: 'merchant-qa',
+            merchantEmail: storeEmail,
+            storeName,
+            storeHandle: handle,
+            productName: product?.name || '',
+            productId,
+            question: question.trim(),
+          }),
+        }).catch(() => {})
+      }
       setQuestion(''); setQaSubmitted(true)
     } catch { /* offline */ }
     setQaSubmitting(false)
