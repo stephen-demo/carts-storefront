@@ -1,5 +1,5 @@
 'use client'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, Suspense } from 'react'
 import { useParams, useRouter, useSearchParams } from 'next/navigation'
 import { ArrowLeft, Star, CheckCircle, ShoppingBag } from '@phosphor-icons/react'
 import { doc, getDoc, updateDoc } from 'firebase/firestore'
@@ -11,11 +11,15 @@ const formatPrice = (n) => `₦${Number(n || 0).toLocaleString('en-NG')}`
 const STATUS_STEPS = ['New', 'Packed', 'Shipped', 'Received']
 const STATUS_LABELS = { New: 'Order received', Packed: 'Being packed', Shipped: 'On the way', Received: 'Delivered' }
 
-export default function OrderTrackingPage() {
+function useActionParam() {
+  const searchParams = useSearchParams()
+  return searchParams.get('action')
+}
+
+function OrderTrackingPageInner() {
   const { handle, orderId } = useParams()
   const router = useRouter()
-  const searchParams = useSearchParams()
-  const actionParam = searchParams.get('action')
+  const actionParam = useActionParam()
 
   const [order, setOrder]       = useState(null)
   const [storeName, setStoreName] = useState(handle)
@@ -254,5 +258,18 @@ export default function OrderTrackingPage() {
         </div>
       </div>
     </div>
+  )
+}
+
+export default function OrderTrackingPage() {
+  return (
+    <Suspense fallback={
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '100vh', background: '#f5f2ee' }}>
+        <div style={{ width: 32, height: 32, borderRadius: '50%', border: '2px solid #111', borderTopColor: 'transparent', animation: 'spin 0.8s linear infinite' }} />
+        <style>{`@keyframes spin{to{transform:rotate(360deg)}}`}</style>
+      </div>
+    }>
+      <OrderTrackingPageInner />
+    </Suspense>
   )
 }
